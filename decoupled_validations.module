@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file
+ * Contains important hooks responsible for validating site content.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function decoupled_validations_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\node\Entity\Node $node */
+  $node = $form_state->getFormObject()->getEntity();
+  $node_bundle = $node->bundle();
+
+  if ($node_bundle == 'movie_trailer') {
+    //$form['#validate'][] = 'decoupled_validations_movie_trailer_link_validate';
+  }
+}
+
+/**
+ * Custom Validation handler for validating youtube links.
+ */
+function decoupled_validations_movie_trailer_link_validate($form, FormStateInterface &$form_state) {
+  // Get submitted link value.
+  $youtube_field_value = $form_state->getValue('field_video_url');
+  $link = $youtube_field_value[0]['uri'];
+
+  // If link does not contain the word youtube, Throw error.
+  if(!strpos($link, 'youtube')) {
+    $form_state->setErrorByName('field_video_url', t('%value is invalid. Please enter youtube URLs only.', ['%value' => $link]));
+  }
+}
+
+/**
+ * Implements hook_entity_bundle_field_info_alter().
+ */
+function decoupled_validations_entity_bundle_field_info_alter(&$fields, EntityTypeInterface $entity_type, $bundle) {
+  // We used this hook as we wanted to add validations to movie_trailer bundle.
+  if ($entity_type->id() == 'node' && $bundle == 'movie_trailer' && !empty($fields['field_video_url'])) {
+    $fields['field_video_url']->addConstraint('YoutubeLink');
+  }
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function decoupled_validations_entity_type_alter(array &$entity_types) {
+  $entity_types['node']->addConstraint('YoutubeSummary');
+}

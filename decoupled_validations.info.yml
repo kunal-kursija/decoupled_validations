@@ -1,0 +1,7 @@
+name: 'Decoupled Validations'
+type: module
+description: 'Contains business logic for running validations on site.'
+package: Validations
+core: 8.x
+dependencies:
+  - drupal:node

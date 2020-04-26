@@ -1,0 +1,7 @@
+decoupled_validations.movie_trailer:
+  path: '/create/movie_trailer'
+  defaults:
+    _controller: '\Drupal\decoupled_validations\Controller\CreateMovieTrailer::build'
+    _title: 'Create Movie Trailer'
+  requirements:
+    _permission: 'administer site configuration'
